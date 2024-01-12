@@ -28,9 +28,17 @@ defmodule ClientSimulatorPubsub do
 
   def publish_repeat() do
     session = GenServer.call(ClientSimulatorPubsub, :call_session)
-    {:ok, publisher} = Session.declare_publisher(session, "from/engine")
-    msg =GenServer.call(ClientSimulatorGenerateJob, :get_task)
-    Publisher.put(publisher, msg |> :erlang.term_to_binary() |> Base.encode64())
+
+    # msg =GenServer.call(ClientSimulatorGenerateJob, :get_task)
+    testmodule = :code.get_object_code(IncMul2)|> :erlang.term_to_binary() |> Base.encode64()
+
+    msg = [testmodule,[1,2,4,2,5]]
+    # msg = [1,2,3,4,5]
+    msg = msg |> :erlang.term_to_binary() |> Base.encode64()
+    # IO.inspect(msg)
+    {:ok, publisher} = Session.declare_publisher(session, "from/client")
+    # msg ="aa"
+    Publisher.put(publisher, msg)
     Process.sleep(5000)
     publish_repeat()
   end
